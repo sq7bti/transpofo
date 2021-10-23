@@ -1,0 +1,17 @@
+
+CW program for COM ports (tone decoder = DCD, PTT = RTS);
+with noise blanking and automatic speed adaption.
+
+Options:
+
+<file>	File name for disk write
+/1.../4	Serial port COM1...4
+/L	Transmit tone with half frequency
+/N	No transmit tone
+/P	DCD input inverse (+ = no tone)
+/S	Simulate manual keying
+
+Example:	cw test.txt /2 /s
+
+Use CTRL-A to CTRL-Z for predefined text files CW_x.TXT;
+F1 to F9 = initial speed, F10 = short/long character gaps
