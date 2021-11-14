@@ -6,6 +6,6 @@ Access to CF card is provided by a small modification to the internals of PoFo, 
 
 To access CF card use mount_drvie.sh script
 Tools
-[*] upload_a.sh / upload_b.sh - upload scripts for either removable disk A:, or built-in B:drive
-[*] copy_folder_structure.sh - create and upload MD script for folder structure re-creation. Use it to upload a large archive folder
-[*] mound_drive.sh - mount CF card image to a local folder
+- upload_a.sh / upload_b.sh - upload scripts for either removable disk A:, or built-in B:drive
+- copy_folder_structure.sh - create and upload MD script for folder structure re-creation. Use it to upload a large archive folder
+- mound_drive.sh - mount CF card image to a local folder
