@@ -1,6 +1,6 @@
 @ECHO OFF
 REM CLS
-PATH=d:\prog;b:\prog;c:\prog;\prog;b:\system;c:\system;\system
+PATH=b:\prog;c:\prog;b:\system;c:\system;\system
 SYSTEM\UPDATE
 REM CLS
 REM APP
