@@ -1,17 +1,11 @@
 @ECHO OFF
-REM CLS
-PATH=c:\prog;\prog;c:\system;\system
-SYSTEM\UPDATE
-REM CLS
-REM APP
-REM ram_test.com
-if exist c:\config.sys goto done
-md c:\system
-copy config.sys c:\
-copy system\*.* c:\system\
-copy ae_c.bat c:\autoexec.bat
-date
-time
-:done
-ver
+PATH=X:\PROG;X:\SYSTEM
 PROMPT $p$g
+if not exist C:\SYSTEM\DONEIT.TXT \SYSTEM\DOIT.BAT
+UPDATE
+PORTDIV
+MDEXTERN X:\PROG\ATMD.COM
+CLS
+VER
+if exist D:\BOOTCF.BAT D:\BOOTCF.BAT
+REM FM2
