@@ -23,6 +23,8 @@ done
 slimit=33423360
 offset=0
 p=${part}
+echo "image ${img}"
+echo "partition num ${p}"
 while [ $p -gt 0 ]; do
 	((offset=offset+slimit))
 	((p=p-1))
@@ -52,4 +54,4 @@ echo "user id   : ${uid}"
 gid=`id -g`
 echo "user gid  : ${gid}"
 
-sudo mount -o loop,${access},user,uid=${user_id},gid=${gid},offset=${offset},sizelimit=${slimit} ${img} ${folder} || rm -rf ${folder}
+sudo mount -o loop,${access},user,uid=${uid},gid=${gid},offset=${offset},sizelimit=${slimit} ${img} ${folder} || rm -rf ${folder}
