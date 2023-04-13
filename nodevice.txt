@@ -1,0 +1,589 @@
+   Link: pingback
+   Link: dns-prefetch
+   Link: Vintage Palmtops » Feed (alternate)
+   Link: Vintage Palmtops » Comments Feed (alternate)
+   Link: Vintage Palmtops » Atari Portfolio and no file transfer device Comments Feed (alternate)
+   Link: https://api.w.org/
+   Link: RSD (EditURI)
+   Link: wlwmanifest
+   Link: PC/XT in your Psion (previous)
+   Link: Psion as an ebook reader (next)
+   Link: canonical
+   Link: shortlink
+   Link: alternate
+   Link: alternate
+
+                                                                           Vintage Palmtops Tips & Tricks
+
+   Subscribe via RSS
+
+     • Home
+     • About
+     • Download
+
+   _____________________ [  ]
+                                                                                     17Jun/1120
+
+Atari Portfolio and no file transfer device
+
+   Sounds familiar? Unfortunately, I won't tell you how to copy files using psychokinetic abilities.  Instead I'll write about a brilliant idea by Viktor T. Toth, who found  out
+   how to write programs on Portfolio without any external compiler. If you're an assembler  coder, you'll probably find it useful to write your own small applications. If  not,
+   I'll try to put some listings on my blog, including a serial transmission program (that  is, the program that is not built-in, so you must copy it somehow to your  Portfolio;
+   if you don't have a parallel interface or a card, you're in deep ass).
+
+   The idea behind Viktor's solution was that you're - in  limited fashion - able to machine-code from within DOS. The  only obstacle is that not all ASCII codes may be  entered
+   using keypresses (e.g. 03 - Ctrl+C ). His  workaround consists of two short programs that  don't contain any "illegal" codes, so you  can type them from DOS prompt. When  you
+   have successfully finished the second one, you'll be able to "compile" text files with hex-coded programs. Now you only need to write your program on a regular PC, compile it
+   to a .com file, view that file with a hex editor and re-type the codes on your Portfolio.
+
+   The original step-by-step instructions are here, but I'll write a short tutorial, just in case 😉
+
+   First, you need to create CAT.COM. This tiny  program allows you to enter any character  (except Ctrl+C and Ctrl+S) and redirect it to  a file. When in the DOS prompt,  press
+   Atari+LOCK to turn on NUM LOCK and type:
+   echo \180^G\128\196^A\205!\136\194\180^B\205!\235\241>cat.com
+   NOTE: \xxx means "hold Alt and type three digits from the numeric (red) keyboard". You  should see a semigraphic character when you release Alt. ^x means Ctrl+X. ! is  simply
+   an exclamation mark (Shift+1).
+
+   If you made no mistakes, the file should be 17 bytes long and run without hanging the computer. And now, here comes the hard part. With CAT.COM you'll write the next program,
+   H2C.COM, but this time the characters won't show up. Type:
+   cat>h2c.com
+   Now, make sure that NUM LOCK is on (the cursor changes to underline) and then hit the following keys:
+   \180 ^H \205 ! < x t (
+   < : | ^B ^D ^I \177 ^D
+   \210 \224 $ \240 P \180 ^H \205
+   ! < x t \233 < : |
+   ^B ^D ^I $ ^O [ ^H \216
+   \136 \194 \180 ^B \205 ! \235 \208
+   \205 spc ^C
+   If you're lucky, you'll get a 50-byte-long file.
+
+   Now it's time to test the compiler. The example code on Viktor's page is long and complicated. Instead, open the built-in editor and type this:
+   b4 09 ba 0b 01 cd 21 b4 4c cd 21 x
+   without spaces and newlines! Save the file as HELLO.HEX and execute:
+   h2c<hello.hex>hello.com
+   Yet you have to  merge the text to  your code. You may  use either the text  editor or CAT.COM, but  remember to redirect CAT.COM's  output to append the  text to the end  of
+   HELLO.COM:
+   CAT.COM>>HELLO.COM
+   Type:
+   Hello world!$
+   (the string must be terminated with $). Hit Ctrl+C (or save the file and hit Esc, when using editor).
+
+   If everything went right, typing HELLO should result in the good old hello message.
+
+    
+
+   [Edit: 2013/10/13]
+
+   Read the comments to this post to find another solution to this problem by DH.
+
+   Filed under: Atari Portfolio, programming Leave a comment
+   Comments (20) Trackbacks (2) ( subscribe to comments on this post )
+
+
+   DH
+   October 13th, 2013 - 19:16
+
+   I don’t know whether you actually read comments so I don’t know if anyone will ever see this, however, I’ve come up with a better solution based on this article. Basically, I
+   thought the whole “Write one program to write another to write a third” was a bit of a faff, so I came up with something that can be written directly from the command  prompt
+   that can do something along the lines of  the final program. My program doesn’t use  Hexadecimal – that would make it far  too complicated to easily implement on the  command
+   line – it instead uses Octal. All Octal  triplets should be separated by spaces (which  prompts the program to output the value of  the current total as a character and  then
+   clear the total) and the string/file should be ended with a letter. No linebreaks are allowed, which is a bit of an issue, but shouldn’t cause too many problems.
+
+   The program is called B8CAT.COM (abbreviation of “Base 8 CAT”, can be pronounced “B-8-Cat” or “Bate-Cat”, whichever’s easier) and is 40 Bytes in length.
+
+   In the following listing, a number preceded by a “/” denotes ALT must be held before typing the number on the numpad (E.G. “/180” means “hold ALT and type 1 8 0”  (ALT+180)),
+   a letter preceded by a “^”  denotes that CTRL must be  held before typing the letter (E.G.  “^A” means “hold CTRL and  press a” (CTRL+A)) and “” is  used in place of a  space
+   character:
+
+   /180 ^P /208 /236 /205 ! /168 /223 t ^Q /168 @ u ^U /131 /224 ^O /177 ^D /254 /201 /211 /226 ^A /194 /235 /229 /180 ^B /205 ! 1 /210 /235 /221 /205 /144
+
+   As in the posted version, this should  be typed following “echo ” and before  “>B8CAT.COM”, E.G. echo ┤^Pðý═!¿▀t^Q¿@u^UâÓ^O▒^D■╔ËÔ^A┬ÙÕ┤^B═!1ÊÙ¦═ É>b8cat.com (your  character
+   set may vary).
+
+   The “/144” at the end isn’t strictly necessary, however I have noticed that ending the string with a space occasionally causes problems, so this adds a “NOP” to the end.
+
+   I hope this information is of use.
+
+   ( REPLY )
+
+
+      DH
+      October 13th, 2013 - 20:21
+
+      Using a little program I quickly wrote to output the contents of a file in Octal, I converted DEBUG.COM from the Original MS-DOS 2.0 disk (the Portfolio’s DIP DOS is based
+      on MS-DOS 2.0) into a format that can be interpreted with B8CAT.COM. You can find the listing here: https://www.dropbox.com/s/eekyurmxcpd62zo/debug.oct
+
+      ( REPLY )
+
+
+         cosi
+         October 13th, 2013 - 20:49
+
+         Kudos. Seriously.
+         Looking forward to hearing from you again! Every good tip will be published.
+
+         ( REPLY )
+
+
+      DH
+      October 13th, 2013 - 20:25
+
+      It seems my original comment was stuffed up by wordpress. Here’s a second attempt at the part that got corrupted:
+
+      In the following listing,  a number preceded  by a “/”  denotes ALT must  be held before  typing the number  on the numpad  (E.G. “/180” means  “hold ALT and  type 1 8  0”
+      (ALT+180)), a letter preceded by a “^” denotes that CTRL  must be held before typing the letter (E.G. “^A” means  “hold CTRL and press a” (CTRL+A)) and “[spc]” is used  in
+      place of a space character:
+
+      /180 ^P /208 /236 /205 ! /168 /223 t ^Q /168 @ u ^U /131 /224 ^O /177 ^D /254 /201 /211 /226 ^A /194 /235 /229 /180 ^B /205 ! 1 /210 /235 /221 /205 [spc] /144
+
+      Apologies for the inconvenience.
+
+      ( REPLY )
+
+
+   cosi
+   October 13th, 2013 - 19:26
+
+   Thanks for the feedback! Indeed, the “write-a-program-to-write-a-program-to-write-a-program” approach may be  a bit annoying, especially when you need to repeat the  sequence
+   each time your Portfolio freezes to death 🙂 On the other hand, hexadecimal notation is a little bit easier to encode when paper-coding your program (or not?).
+
+   PS. Don’t worry, people still read this post, so your advice can still save lives 😉
+
+   ( REPLY )
+
+
+      DH
+      October 15th, 2013 - 22:55
+
+      As requested, I put in an afternoon of  work and managed to get a full  HEX version working! I’ve called it B16CAT.COM to  keep it separate from the above HEXCAT  program.
+      B16CAT can be pronounced as either “B Sixteen Cat” or “Big Cat”, whichever takes your fancy.
+
+      Here’s a listing. As usual, “\” is “ALT+”, “^” is “CTRL+” and “[SPACE]” is the space bar. I’ve spaced out the characters for easier reading:
+      1 \210 \180 ^P \208 \236 \205 ! \168 @ u ^T \168 [SPACE] t \242 \168 ^P u ^P \168 ^A u ^X \180 ^B \205 ! 1 \210 \235 \226 ^D ^E ^D ^D $ ^O \177 ^D \211 \226 0 \228 ^A \194
+      \235 \210 \205 [SPACE] \144
+
+      When typed in, it should look something like this:
+      echo 1Ò´^PÐìÍ!¨@u^T¨ tò¨^Pu^P¨^Au^X´^BÍ!1Òëâ^D^E^D^D$^O±^DÓâ0ä^AÂëÒÍ  >B16CAT.COM
+
+      ( REPLY )
+
+
+         DH
+         October 17th, 2013 - 19:20
+
+         I forgot to mention: all  bytes represented in Hex should  be separated by spaces (E.G.  “4E 51 7A” etc) and  to exit the program, type  “!”. Also, line breaks will  be
+         ignored, so, while your Hex code can include line-breaks, you should not use these as a replacement for spaces.
+
+         ( REPLY )
+
+
+            cosi
+            October 18th, 2013 - 10:23
+
+            I think that your program deserves a new post on this blog 🙂 Give me a few days.
+
+            ( REPLY )
+
+
+               DH
+               October 21st, 2013 - 19:57
+
+               Thanks!!!
+
+               Here’s the entirety of  the MORE.COM program  from MS-DOS 2.0  (written in the  Hex format supported  by B16CAT), since  it doesn’t come  with the Portfolio.  The
+               significance of this will become clear when I comment on a different post…
+
+               B4 30 CD 21 86 E0 3D 00 02 73 09 BA FC 01 B4 09 CD 21 CD 20 C6 06 E7 01 19 B4 0F CD 10 88 26 E8 01 BA 17 02 B4 09 CD 21 33 DB B4 45 CD 21 8B E8 B4 3E CD 21 BB  02
+               00 B4 45 CD 21 FC BA 1A 02 B9 00 10 8B DD B4 3F CD 21 0B C0 75 02 CD 20 8B C8 8B F2 AC
+               3C 1A 74 F5 3C 0D 75 07 C6 06 EA 01 01 EB 4C 3C 0A 75 06 FE 06 E9 01 EB 42 3C 08 75 0D 80 3E EA 01 01 74 37 FE 0E EA 01 EB 31 3C 09 75 12 8A 26 EA 01 80 C4 07  80
+               E4 F8 FE C4 88 26 EA 01 EB 1B 3C 07 74 17 FE 06 EA 01 8A 26 EA 01 3A 26 E8 01 76 09 FE
+               06 E9 01 C6 06 EA 01 01 8A D0 B4 02 CD 21 8A 26 E9 01 3A 26 E7 01 72 20 BA F0 01 B4 09 CD 21 B4 0C B0 01 CD 21 BA 17 02 B4 09 CD 21 C6 06 EA 01 01 C6 06 E9 01  01
+               4E 41 49 74 03 E9 6E FF E9 54 FF 18 50 01 01 00 00 00 00 00 0D 2D 2D 20 4D 6F 72 65 20
+               2D 2D 24 4D 4F 52 45 3A 20 49 6E 63 6F 72 72 65 63 74 20 44 4F 53 20 76 65 72 73 69 6F 6E 0D 0A 24 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  00
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 !
+
+
+               DH
+               October 21st, 2013 - 19:58
+
+               Ah, it’s taken out my spaces at the ends of the lines. Those will need to be put back…
+
+
+               DH
+               October 27th, 2013 - 21:17
+
+               I have created a version of MORE.COM that can be typed  in from the command line. It’s quite long, so it has  to be typed in in stages using the “>>” redirect  to
+               append data to the end of the file. As usual, the “\” is “ALT+”, the “[SPACE]” is the space-bar and “^” is “CTRL+”.
+
+               (The “characters” are separated by spaces for ease of reading – don’t enter these at the prompt):
+               \176 ^N \254 \200 \162 4 ^B \162 \92 ^B , ^D \254 \192 \162 5 ^B \162 ] ^B \180 0 \205 ! \134 \224 H = \254 ^A w ^K \186 A ^B \180 ^R \208
+               \236 \205 ! \205 [SPACE] \198 ^F 0 ^B ^Y \180 ^O \205 ^P \134 \224 \162 1 ^B \144 \144 \144 \144 1 \219 \180 E \205 ! \137 \197 \180 = \254
+               \196 \205 ! \187 ^B \128 \129 \227 ^O ^A \180 E \205 ! \252 \186 _ ^B \185 ^A ^P I \137 \235 \180 ? \205 ! ! \192 u ^B \205 [SPACE] \137 \193
+               \137 \214 \172 0 \228 \254 \196 \168 \128 t ^D ^D \128 \235 Z ^L \128 = \154 ^A t \230 = \141 ^A u ^K \144 \144 \144 \198 ^F 3 ^B ^A \235 ]
+               \144 = \138 ^A u ^F \254 ^F 2 ^B \235 Q = \136 ^A u ^U \144 \138 ^V 3 ^B 0 \246 \254 \198 \129 ^Y0 ^A ^A t = \254 ^N 3 ^B \235 7 = \137 ^A u
+               ^T \138 6 3 ^B \128 \198 ^F \254 \198 \128 \230 \248 \254 \198 \136 6 3 ^B \235 \30 = \135 ^A t ^Y \254 ^F 3 ^B \138 6 3 ^B : 6 1 ^B v ^K
+               \144 \144 \254 ^F 2 ^B \198 ^F 3 ^B ^A , \128 \136 \194 \180 ^B \205 ! \138 6 2 ^B : 6 0 ^B r $ \186 4 ^B \180 ^R \208 \236 \205 ! \180 ^L
+               \176 ^A \205 ! \186 \92 ^B \180 ^R \208 \236 \205 ! \198 ^F 3 ^B ^A \198 ^F 2 ^B ^A N A I \144 \144 t ^D \144 \233 A \255 \233 & \255 ^X P ^A
+               ^A \141 \138 – – [SPACE] M o r e [SPACE] – – $ M O R E : [SPACE] I n c o r r e c t [SPACE] D O S [SPACE] V e r s i o n \141 \138 $
+
+               This should look something like this (depending upon your character set):
+               ECHO ░^N■╚ó4^Bó\^B,^D■└ó5^Bó]^B┤0═!åÓH=■^Aw^K║A^B┤^Rð>MOREPT.COM
+               ECHO ý═!═ ã^F0^B^Y┤☼═^PåÓó1^BÉÉÉÉ1█┤E═!ë┼┤=■>>MOREPT.COM
+               ECHO ─═!╗^BÇüÒ☼^A┤E═!³║_^B╣^A^PIëÙ┤?═!!└u^B═ ë┴>>MOREPT.COM
+               ECHO ëÍ¼0õ■─¿Çt^D^DÇÙZ^LÇ=Ü^Atµ=ì^Au^KÉÉÉã^F3^B^AÙ]>>MOREPT.COM
+               ECHO É=è^Au^F■^F2^BÙQ=ê^Au^UÉè^V3^B0÷■ãü·^A^At=■^N3^BÙ7=ë^Au>>MOREPT.COM
+               ECHO ^Tè63^BÇã^F■ãÇµ°■ãê63^BÙ▲=ç^At^Y■^F3^Bè63^B:61^Bv^K>>MOREPT.COM
+               ECHO ÉÉ■^F2^Bã^F3^B^A,Çê┬┤^B═!è62^B:60^Br$║4^B┤^Rðý═!┤^L>>MOREPT.COM
+               ECHO ░^A═!║\^B┤^Rðý═!ã^F3^B^Aã^F2^B^ANAIÉÉt^DÉÚA Ú& ^XP^A>>MOREPT.COM
+               ECHO ^Aìè– More –$MORE: Incorrect DOS Versionìè$>>MOREPT.COM
+
+               This will give a complete version of MORE that I have entitled MOREP for reasons I can’t quite remember right now…
+
+               Hope this helps!
+
+
+            DH
+            December 13th, 2013 - 21:04
+
+            Just for fun, here’s the Hex code for a program I wrote that uses the Portfolio’s additional BIOS commands:
+            B4 16 B9 19 00 B2 3C CD 61 B2 3B CD 61 B2 3C CD 61 B2 3B CD 61 B2 3C CD 61 B2 38 CD 61 B2 29 CD 61 B2 39 CD 61 B2 36 CD 61 CD 20 !
+
+            Be sure to use spaces between the bytes when entering them.
+
+            ( REPLY )
+
+
+               cosi
+               December 13th, 2013 - 22:03
+
+               Chapeau bas! 🙂
+               DH, please let me know if you’ve received my emails!
+
+
+   Jens
+   June 6th, 2014 - 09:16
+
+   Hi,
+
+   i recently got a pofo by a friend and now i’m  playing around with it. Got some problems creating h2c.com. It’s  always 52 bytes in size. i recreated cat.com but this  didn’t
+   help. h2c doesn’t work.
+
+   maybe it would help if you only use / and ^ in the code?
+
+   BTW, is there any way to persist data on board or is there an internal battery i can change to keep data on “disk”?
+   (a mmc card hack would be funny..)
+
+   ( REPLY )
+
+
+      cosi
+      June 6th, 2014 - 19:50
+
+      Congratulations on getting your hands on a Portfolio! It seems  that you misunderstood me a bit. The code generating  h2c.com isn’t meant to be typed exactly as it  reads.
+      Instead, press Portfolio key+LOCK to turn on NumLock (the  cursor will change to an underscore) and then, when  you encounter a backslash followed by a number, press  Alt,
+      type that number on the numeric keyboard (red digits) and release Alt. ^ means Control key; press Control, then a letter following the “^” sign, and release Control.
+
+      ( REPLY )
+
+
+         Jens
+         June 10th, 2014 - 09:17
+
+         I did understand this  but still, h2c.com is  about 52 bytes  long and i don’t  understand why. To my  mind, it would  prevent several mistakes if  there would only  be
+         ALT-Codes or at least ALT and CTRL..
+         I tried to translate this on my own now and hope this works..
+
+         echo \180 ^G \128 \196 ^A \205 \136 \194 \180 ^B \205 33 \235 \241 > cat.com
+
+         and for h2c (i’ll try it in next few hours..)
+
+         \180 ^H \205 33 60 \120 \116 40
+         60 58 \124 ^B ^D ^I \177 ^D
+         \210 \224 36 \240 80 \180 ^H \205
+         33 60 \120 \116 \233 60 58 \124
+         ^B ^D ^I 36 ^O 91 ^H \216
+         \136 \194 \180 ^B \205 33 \235 \208
+         \205 spc ^C
+
+         ( REPLY )
+
+
+            Jens
+            June 10th, 2014 - 09:25
+
+            my replacement of cat.com missed a ! (33) sorry for that..
+
+            echo \180 ^G \128 \196 ^A \205 33 \136 \194 \180 ^B \205 33 \235 \241 > cat.com
+
+            ( REPLY )
+
+            Jens
+            June 10th, 2014 - 09:54
+
+            Getting 50 Bytes for h2c.com now but my hello.com is 0 bytes in size and h2c.com doesn’t end running, so i had to reset the portfolio.
+
+            btw. i even saw that this discussion system erases \ 0 .. since my code only has CTRL and ALT in it (besides the spc) the rest has to be a ALT-0 plus the two digits…
+
+            ( REPLY )
+
+
+               cosi
+               June 10th, 2014 - 12:59
+
+               You know, usually the devil is in the details – maybe you made a mistake  when typing alt-codes? If you print out the contents of h2c.com using type h2c.com,  you
+               should see if your codes have been translated to the characters from this post (like “!”, “x” etc.).
+
+
+      cosi
+      June 6th, 2014 - 19:55
+
+      > a mmc card hack would be funny..
+      I agree 😉
+      So far there’s no such mod available, however there were succesful attempts to make  the Portfolio read CF cards. There are instructions on the Internet, so if you’re  not
+      afraid of a soldering iron, you can easily make your Pofo read CF’s.
+      For various hardware mods, take a look at http://pofowiki.de (in German).
+
+      ( REPLY )
+
+  Leave a comment Cancel reply
+
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+   ______________________________________________
+
+   _______________________________ Name (required)
+
+   _______________________________ Email (required)
+
+   _______________________________ Website
+
+   [ Submit ]
+
+   DH’s hacks for the Portfolio « Vintage Palmtops
+   » Atari Portfolio Serial Interface: How To Get Terminal Software
+   Psion as an ebook reader » « PC/XT in your Psion
+
+  Recent Posts
+
+     Atari Portfolio on Reddit
+     DH’s hacks for the Portfolio
+     The incomplete Atari Portfolio disassembly guide
+     [RC] Not this time
+     Hinges 2: Psion
+
+  Categories
+
+     Amstrad NC
+     Atari Portfolio
+     emulation
+     general
+     hardware
+     HP LX
+     Palm OS
+     programming
+     Psion (EPOC)
+     Psion (SIBO)
+     Psion Organiser
+     Retrochallenge
+
+  Calendar
+
+   June 2011
+   M  T  W  T  F  S  S
+               Jul »
+         1  2  3  4  5
+   6  7  8  9  10 11 12
+   13 14 15 16 17 18 19
+   20 21 22 23 24 25 26
+   27 28 29 30  
+
+
+  Archives
+
+     October 2014
+     March 2014
+     September 2013
+     August 2013
+     July 2013
+     June 2013
+     April 2013
+     February 2013
+     January 2013
+     December 2012
+     October 2012
+     September 2012
+     August 2012
+     July 2012
+     May 2012
+     March 2012
+     November 2011
+     October 2011
+     September 2011
+     August 2011
+     July 2011
+     June 2011
+
+  Resources
+
+     Bioeddie's
+     pofo.website.pl
+     PofoWiki
+     portfolio.wz.cz
+     Psion Organiser II Homepage
+     Psion Welt
+     Tim's Amstrad NC Users' Site
+
+   Copyright © 2023 Vintage Palmtops · Powered by WordPress
+   Lightword Theme by Andrei Luca Go to top ↑
+
+References
+
+   Visible links
+   . https://palmtop.cosi.com.pl/xmlrpc.php
+   . file://s.w.org
+   . https://palmtop.cosi.com.pl/feed/
+   . https://palmtop.cosi.com.pl/comments/feed/
+   . https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/feed/
+   . https://palmtop.cosi.com.pl/wp-json/
+   . https://palmtop.cosi.com.pl/xmlrpc.php?rsd
+   . https://palmtop.cosi.com.pl/wp-includes/wlwmanifest.xml
+   . https://palmtop.cosi.com.pl/2011/06/15/pc-xt-in-your-psion/
+   . https://palmtop.cosi.com.pl/2011/06/19/psion-as-an-ebook-reader/
+   . https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/
+   . https://palmtop.cosi.com.pl/?p=31
+   . https://palmtop.cosi.com.pl/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fpalmtop.cosi.com.pl%2F2011%2F06%2F17%2Fatari-portfolio-and-no-file-transfer-device%2F
+   . https://palmtop.cosi.com.pl/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fpalmtop.cosi.com.pl%2F2011%2F06%2F17%2Fatari-portfolio-and-no-file-transfer-device%2F&format=xml
+   . Vintage Palmtops
+	https://palmtop.cosi.com.pl/
+   . Syndicate this site using RSS
+	https://palmtop.cosi.com.pl/feed/
+   . Home
+	https://palmtop.cosi.com.pl/
+   . https://palmtop.cosi.com.pl/about/
+   . https://palmtop.cosi.com.pl/download/
+   . https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/#comments
+   . Atari Portfolio and no file transfer device
+	https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/
+   . http://www.vttoth.com/
+   . http://www.rskey.org/detail.asp?manufacturer=Atari&model=Portfolio
+   . https://palmtop.cosi.com.pl/category/atari-portfolio/
+   . https://palmtop.cosi.com.pl/category/programming/
+   . https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#
+   . https://palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/feed/
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-706
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=706#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-708
+   . https://www.dropbox.com/s/eekyurmxcpd62zo/debug.oct
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=708#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-710
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=710#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-709
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=709#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-707
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=707#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-713
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=713#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-717
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=717#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-718
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=718#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-725
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-726
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-830
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-971
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=971#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-972
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2593
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2593#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2597
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2597#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2642
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2642#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2643
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2643#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2644
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2644#respond
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2649
+   . file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#comment-2598
+   . http://pofowiki.de/
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/?replytocom=2598#respond
+   . file:///2011/06/17/atari-portfolio-and-no-file-transfer-device/#respond
+   . http://palmtop.cosi.com.pl/2014/03/15/dhs-hacks-for-the-portfolio/
+   . http://biosrhythm.com/?p=1441
+   . https://palmtop.cosi.com.pl/2011/06/19/psion-as-an-ebook-reader/
+   . https://palmtop.cosi.com.pl/2011/06/15/pc-xt-in-your-psion/
+   . https://palmtop.cosi.com.pl/2014/10/07/atari-portfolio-on-reddit/
+   . https://palmtop.cosi.com.pl/2014/03/15/dhs-hacks-for-the-portfolio/
+   . https://palmtop.cosi.com.pl/2013/09/28/atari-portfolio-disassembly-guide/
+   . https://palmtop.cosi.com.pl/2013/08/01/rc-not-this-time/
+   . https://palmtop.cosi.com.pl/2013/07/12/hinges-psion/
+   . https://palmtop.cosi.com.pl/category/amstrad-nc/
+   . https://palmtop.cosi.com.pl/category/atari-portfolio/
+   . https://palmtop.cosi.com.pl/category/emulation/
+   . https://palmtop.cosi.com.pl/category/general/
+   . https://palmtop.cosi.com.pl/category/hardware/
+   . https://palmtop.cosi.com.pl/category/hp-lx/
+   . https://palmtop.cosi.com.pl/category/palm-os/
+   . https://palmtop.cosi.com.pl/category/programming/
+   . https://palmtop.cosi.com.pl/category/psion-epoc/
+   . https://palmtop.cosi.com.pl/category/psion-sibo/
+   . https://palmtop.cosi.com.pl/category/psion-organiser/
+   . https://palmtop.cosi.com.pl/category/retrochallenge/
+   . https://palmtop.cosi.com.pl/2011/07/
+   . https://palmtop.cosi.com.pl/2011/06/14/
+   . https://palmtop.cosi.com.pl/2011/06/15/
+   . https://palmtop.cosi.com.pl/2011/06/17/
+   . https://palmtop.cosi.com.pl/2011/06/19/
+   . https://palmtop.cosi.com.pl/2011/06/21/
+   . https://palmtop.cosi.com.pl/2011/06/28/
+   . https://palmtop.cosi.com.pl/2014/10/
+   . https://palmtop.cosi.com.pl/2014/03/
+   . https://palmtop.cosi.com.pl/2013/09/
+   . https://palmtop.cosi.com.pl/2013/08/
+   . https://palmtop.cosi.com.pl/2013/07/
+   . https://palmtop.cosi.com.pl/2013/06/
+   . https://palmtop.cosi.com.pl/2013/04/
+   . https://palmtop.cosi.com.pl/2013/02/
+   . https://palmtop.cosi.com.pl/2013/01/
+   . https://palmtop.cosi.com.pl/2012/12/
+   . https://palmtop.cosi.com.pl/2012/10/
+   . https://palmtop.cosi.com.pl/2012/09/
+   . https://palmtop.cosi.com.pl/2012/08/
+   . https://palmtop.cosi.com.pl/2012/07/
+   . https://palmtop.cosi.com.pl/2012/05/
+   . https://palmtop.cosi.com.pl/2012/03/
+   . https://palmtop.cosi.com.pl/2011/11/
+   . https://palmtop.cosi.com.pl/2011/10/
+   . https://palmtop.cosi.com.pl/2011/09/
+   . https://palmtop.cosi.com.pl/2011/08/
+   . https://palmtop.cosi.com.pl/2011/07/
+   . https://palmtop.cosi.com.pl/2011/06/
+   . Tons of Organiser, SIBO and EPOC software (en)
+	http://www.bioeddie.co.uk/index.htm
+   . Useful informations and files (en,pl)
+	http://www.pofo.website.pl/
+   . Wiki and software repository (de)
+	http://www.pofowiki.de/doku.php
+   . Hardware mods, programming, downloads (cz)
+	http://portfolio.wz.cz/
+   . I think it’s the only still running website dedicated to Organisers with the forum that’s still alive (en)
+	http://archive.psion2.org/org2/org2.htm
+   . Psion news and forum (de)
+	http://www.psionwelt.de/
+   . Plenty of NC resources: documentation, software, FAQs etc. (en)
+	http://ncus.org.uk/
+   . https://palmtop.cosi.com.pl/
+   . WordPress
+	http://www.wordpress.org/
+   . Lightword Theme
+	http://www.lightword-design.com/
+   . Go to top
+	file:///home/simon/Documents/atari/pofo/rskey/palmtop.cosi.com.pl/2011/06/17/atari-portfolio-and-no-file-transfer-device/index.html#top
